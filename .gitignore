@@ -1,0 +1,5 @@
+.idea/
+.DS_Store
+.c9
+node_modules
+bower_components

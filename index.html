@@ -1,0 +1,82 @@
+<html>
+<head>
+  <title>esplor's iPXE</title>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<body>
+<div class="container">
+<h3>iPXE</h3>
+  <p class="well">
+  You can chainload your <a href="http://ipxe.org/" target="_blank">iPXE</a>
+  to this file for a Debian / Ubuntu network install.
+  </p>
+<div class="well">
+  <ul>
+    <li>
+      <a href="./undionly.kpxe" target="_blank">iPXE undionly (PXE chainload)</a>
+    </li>
+    <li>
+      <a href="./ipxe.iso" target="_blank">iPXE iso file</a>
+    </li>
+    <li>
+      <a href="./ipxe64.efi" target="_blank">iPXE efi 64 boot file</a>
+    </li>
+  </ul>
+</div>
+<h3>Remember:</h3>
+<p>You have to be in the src directory of iPXE.</p>
+<pre>
+cat &lt;&lt;EOF&gt; esplor.github.io.boot.ipxe
+#!ipxe
+
+dhcp
+chain http://esplor.github.io/boot.ipxe
+EOF
+
+make bin/undionly.kpxe EMBED=esplor.github.io.boot.ipxe
+</pre>
+<p>
+
+If you don't want too make yourself a pxe file, you may use my <a href="esplor-ipxe.iso">ISO</a> file.
+Dowload, burn it or mount it. </ br>Iso file is tested in VirtualBox and VmWare.
+
+</p>
+<div class="row">
+    <div>
+        <h3>Note:</h3>
+        <p>
+		Debian use <a href="http://httpredir.debian.org" target="_blank">http://httpredir.debian.org</a> to redirect to your closest mirror.
+	</p>
+	<p>
+		Source code at <a href="https://github.com/rgeissert/http-redirector" target="_blank">https://github.com/rgeissert/http-redirector</a>
+	</p>
+    </div>
+    <div>
+      Ubuntu use the official Norwegian mirror. (<a href="http://no.archive.ubuntu.com" target="_blank">http://no.archive.ubuntu.com</a>)<br />
+    </div>
+</div>
+<!-- How do i make this nicer(er) -->
+<div class="row">
+  <div>
+    <h3>How to add Virtualbox to a Debian box..</h3>
+  </div>
+  <pre>Become root/superuser first: "sudo -i" or "su -" </pre>
+<pre>
+cat &lt;&lt;EOF&gt; /etc/apt/sources.list.d/vbox.list
+deb http://download.virtualbox.org/virtualbox/debian wheezy contrib
+EOF
+wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | apt-key add -
+apt-get update
+apt-get install virtualbox-4.3
+</pre>
+</div>
+<div id="links" class="">
+    <ul>
+        <li><a href="/kontakter/">Techie lookup</a> - Fiber connectors for now...</li>
+        <li><a href="/PL/">Yellow pages</a> - Nothing here yet.</li>
+        <li><a href="/angularfire-techie/">Techie lookup :)</a> - Nothing fancy at all, just trying Firebase and Angular.</li>
+        <li><a href="/mortsund.no/">mortsund.no</a> - Our second home. ETA unknown...</li>
+    </ul>
+</div>
+</div>
+</body>
+</html>

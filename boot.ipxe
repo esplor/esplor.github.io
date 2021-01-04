@@ -1,0 +1,143 @@
+#!ipxe
+
+# Credits goes to Robin Smidsrød
+# As ipxe homepage didn't have so much samples of a ipxe menu, this gist
+# helped me alot. https://gist.github.com/robinsmidsrod/2234639
+
+# Some menu defaults
+# Usually set in another .ipxe file chained to this file.
+
+isset ${menu-default} || set menu-default exit
+set menu-timeout 5000
+set submenu-timeout ${menu-timeout}
+
+# Get CPU architecture (AutoArch)
+cpuid --ext 29 && set arch amd64 || set arch i386
+
+###################### MainMenu ####################################
+
+:start
+menu iPXE ( AutoArch: ${arch} )
+item --gap --             ------------------------- Operating systems ------------------------------
+item --key d debmenu      d - Debian GNU/Linux  (Debian Menu)
+item --key k kali         k - Kali Linux        (Rolling Release)
+item rancher              RancherOS - Latest    (PW: 1234)
+item --key n netboots     netboot.xyz           (Chain ipxe to https://boot.netboot.xyz)
+item netboots             netboot.xyz           (Chain ipxe to http://boot.netboot.xyz)
+item --gap --             ---------------------------------OTHER------------------------------------
+item --key s shell        s - Drop to iPXE shell
+item --key r reboot       r - Reboot computer
+item --key p poff         p - Power off computer
+item --gap --             --------------------------------------------------------------------------
+item
+item --key x exit         x - Exit iPXE and continue BIOS boot
+choose --timeout ${menu-timeout} --default ${menu-default} selected || goto cancel
+set menu-timeout 0
+goto ${selected}
+
+:failed
+echo Booting failed, dropping iPXE shell
+goto shell
+
+:reboot
+reboot
+
+:poff
+poweroff || goto failed
+
+:cancel
+echo You cancelled the menu, dropping you to iPXE shell
+goto shell
+
+:shell
+echo Type 'exit' to get the back to the menu
+shell
+set menu-timeout 0
+set submenu-timeout 0
+goto start
+
+### DEBIAN MENU ###
+:debmenu
+menu Debian netinstall
+item --gap --             --------------------------------------------------------------------------
+item --key b debbuster    B - Debian Buster         ( 10 )
+item --key s debstretch   S - Debian Stretch        ( 9 )
+item --gap --             --------------------------------------------------------------------------
+item --key t debtst       T - Debian Testing        ( Next release )
+item --key u debsid       U - Debian Sid            ( Unstable )
+item --gap --             --------------------------------------------------------------------------
+item
+item --key 0x08 back      Back to main menu...
+iseq ${menu-default} menu-install && isset ${submenu-default} && goto menu-install-timed ||
+choose selected && goto ${selected} || goto start
+
+### DEBIAN NETBOOT ###
+:debbuster
+set release buster
+set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
+echo Booting Debian ${release} (${arch})
+imgfree
+kernel ${deburl}/linux vga=794
+initrd ${deburl}/initrd.gz
+boot
+
+:debstretch
+set release stretch
+set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
+echo Booting Debian ${release} (${arch})
+imgfree
+kernel ${deburl}/linux vga=794
+initrd ${deburl}/initrd.gz
+boot
+
+:debstretchps
+set release stretch
+set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
+echo Booting Debian ${release} (${arch})
+imgfree
+kernel ${deburl}/linux vga=794 auto url=http://esplor.github.io/debian/preseed.txt
+initrd ${deburl}/initrd.gz
+boot
+
+:debtst
+set release testing
+set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
+echo Booting Debian ${release} (${arch})
+imgfree
+kernel ${deburl}/linux vga=794
+initrd ${deburl}/initrd.gz
+boot
+
+
+:debsid
+set release sid
+set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
+echo Booting Debian ${release} (${arch})
+imgfree
+kernel ${deburl}/linux vga=794
+initrd ${deburl}/initrd.gz
+boot
+
+### Kali Linux ###
+:kali
+set release kali-rolling
+set kaliurl http://http.kali.org/kali/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
+echo Booting Kali Rolling Release (${arch})
+kernel ${kaliurl}/linux vga=794
+initrd ${kaliurl}/initrd.gz
+boot
+
+### Rancher Os ###
+:rancher
+set version latest
+set base-url http://releases.rancher.com/os/${version}
+echo Booting RancherOs from ${base-url}
+kernel ${base-url}/vmlinuz vga=794 rancher.state.dev=LABEL=RANCHER_STATE rancher.state.autoformat=[/dev/sda] rancher.password=1234
+initrd ${base-url}/initrd
+boot
+
+:netboots
+chain https://boot.netboot.xyz
+
+:netboot
+chain http://boot.netboot.xyz

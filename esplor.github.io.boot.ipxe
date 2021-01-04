@@ -1,0 +1,4 @@
+#!ipxe
+
+dhcp
+boot http://esplor.github.io/boot.ipxe
