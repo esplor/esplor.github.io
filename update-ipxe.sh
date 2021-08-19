@@ -4,6 +4,7 @@
 clear
 
 echo updating submodules
+git submodule init
 git submodule update --recursive --remote
 
 # Set relative location of the embedfile.
