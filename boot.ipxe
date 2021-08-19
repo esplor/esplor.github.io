@@ -21,9 +21,8 @@ menu iPXE ( AutoArch: ${arch} )
 item --gap --             ------------------------- Operating systems ------------------------------
 item --key d debmenu      d - Debian GNU/Linux  (Debian Menu)
 item --key k kali         k - Kali Linux        (Rolling Release)
-item rancher              RancherOS - Latest    (PW: 1234)
-item --key n netboots     netboot.xyz           (Chain ipxe to https://boot.netboot.xyz)
-item netboots             netboot.xyz           (Chain ipxe to http://boot.netboot.xyz)
+item --key n netboot      http://netboot.xyz    (Chain ipxe to http://boot.netboot.xyz)
+item netboots             https://netboot.xyz   (Chain ipxe to https://boot.netboot.xyz)
 item --gap --             ---------------------------------OTHER------------------------------------
 item --key s shell        s - Drop to iPXE shell
 item --key r reboot       r - Reboot computer
@@ -60,10 +59,11 @@ goto start
 :debmenu
 menu Debian netinstall
 item --gap --             --------------------------------------------------------------------------
-item --key b debbuster    B - Debian Buster         ( 10 )
-item --key s debstretch   S - Debian Stretch        ( 9 )
+item --key b debbllseye   B - Debian Buster         ( 11 )
+item --key o debbuster    O - Debian Buster         ( 10 )
+item --key s debstretch   S - Debian Stretch        ( 09 )
 item --gap --             --------------------------------------------------------------------------
-item --key t debtst       T - Debian Testing        ( Next release )
+item --key t debtesting   T - Debian Testing        ( Next release )
 item --key u debsid       U - Debian Sid            ( Unstable )
 item --gap --             --------------------------------------------------------------------------
 item
@@ -72,6 +72,15 @@ iseq ${menu-default} menu-install && isset ${submenu-default} && goto menu-insta
 choose selected && goto ${selected} || goto start
 
 ### DEBIAN NETBOOT ###
+:debbllseye
+set release bullseye
+set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
+echo Booting Debian ${release} (${arch})
+imgfree
+kernel ${deburl}/linux vga=794
+initrd ${deburl}/initrd.gz
+boot
+
 :debbuster
 set release buster
 set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
@@ -90,16 +99,7 @@ kernel ${deburl}/linux vga=794
 initrd ${deburl}/initrd.gz
 boot
 
-:debstretchps
-set release stretch
-set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
-echo Booting Debian ${release} (${arch})
-imgfree
-kernel ${deburl}/linux vga=794 auto url=http://esplor.github.io/debian/preseed.txt
-initrd ${deburl}/initrd.gz
-boot
-
-:debtst
+:debtesting
 set release testing
 set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
 echo Booting Debian ${release} (${arch})
@@ -127,17 +127,8 @@ kernel ${kaliurl}/linux vga=794
 initrd ${kaliurl}/initrd.gz
 boot
 
-### Rancher Os ###
-:rancher
-set version latest
-set base-url http://releases.rancher.com/os/${version}
-echo Booting RancherOs from ${base-url}
-kernel ${base-url}/vmlinuz vga=794 rancher.state.dev=LABEL=RANCHER_STATE rancher.state.autoformat=[/dev/sda] rancher.password=1234
-initrd ${base-url}/initrd
-boot
+:netboot
+chain http://boot.netboot.xyz
 
 :netboots
 chain https://boot.netboot.xyz
-
-:netboot
-chain http://boot.netboot.xyz
