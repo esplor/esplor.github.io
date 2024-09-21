@@ -58,21 +58,32 @@ goto start
 ### DEBIAN MENU ###
 :debmenu
 menu Debian netinstall
-item --gap --             --------------------------------------------------------------------------
-item --key b debbllseye   B - Debian Buster         ( 11 )
-item --key o debbuster    O - Debian Buster         ( 10 )
-item --key s debstretch   S - Debian Stretch        ( 09 )
-item --gap --             --------------------------------------------------------------------------
-item --key t debtesting   T - Debian Testing        ( Next release )
-item --key u debsid       U - Debian Sid            ( Unstable )
-item --gap --             --------------------------------------------------------------------------
+item --gap --           --------------------------------------------------------------------------
+item bookworm           Bookworm                    ( 12 )
+item bullseye           Bullseye                    ( 11 )
+item buster             Buster                      ( 10 )
+item stretch            Stretch                     ( 09 )
+item next               Debian next codename        ( Trixie )
+item --gap --           --------------------------------------------------------------------------
+item testing            Debian Testing              ( Next release )
+item sid                Debian Sid                  ( Unstable )
+item --gap --           --------------------------------------------------------------------------
 item
 item --key 0x08 back      Back to main menu...
 iseq ${menu-default} menu-install && isset ${submenu-default} && goto menu-install-timed ||
 choose selected && goto ${selected} || goto start
 
 ### DEBIAN NETBOOT ###
-:debbllseye
+:bookworm
+set release bookworm
+set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
+echo Booting Debian ${release} (${arch})
+imgfree
+kernel ${deburl}/linux vga=794
+initrd ${deburl}/initrd.gz
+boot
+
+:bullseye
 set release bullseye
 set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
 echo Booting Debian ${release} (${arch})
@@ -81,7 +92,8 @@ kernel ${deburl}/linux vga=794
 initrd ${deburl}/initrd.gz
 boot
 
-:debbuster
+
+:buster
 set release buster
 set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
 echo Booting Debian ${release} (${arch})
@@ -90,7 +102,7 @@ kernel ${deburl}/linux vga=794
 initrd ${deburl}/initrd.gz
 boot
 
-:debstretch
+:stretch
 set release stretch
 set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
 echo Booting Debian ${release} (${arch})
@@ -99,7 +111,17 @@ kernel ${deburl}/linux vga=794
 initrd ${deburl}/initrd.gz
 boot
 
-:debtesting
+### NOT RELEASED
+:next
+set release trixie
+set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
+echo Booting Debian ${release} (${arch})
+imgfree
+kernel ${deburl}/linux vga=794
+initrd ${deburl}/initrd.gz
+boot
+
+:testing
 set release testing
 set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
 echo Booting Debian ${release} (${arch})
@@ -109,7 +131,7 @@ initrd ${deburl}/initrd.gz
 boot
 
 
-:debsid
+:sid
 set release sid
 set deburl http://deb.debian.org/debian/dists/${release}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}
 echo Booting Debian ${release} (${arch})
